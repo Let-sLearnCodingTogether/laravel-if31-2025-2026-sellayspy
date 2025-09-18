@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(LoginRequest $request) {
+    public function register(RegisterRequest $request) {
         try {
             $validated = $request->safe()->all();
             $passwordHash = Hash::make($validated['password']);
@@ -23,19 +23,39 @@ class AuthController extends Controller
                 return response()->json([
                     'message' => 'register berhasil',
                     'user' => $response
-                ]);
+                ], 201);
             }
         } catch(Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'data'  => null
+            ], 500);
         }
 
     }
 
-    public function login(RegisterRequest $request) {
+    public function login(LoginRequest $request) {
         try {
             $validated = $request->safe()->all();
+            if(!Auth::attempt($validated)) {
+                return response()->json([
+                    'message' => 'email atau password salah',
+                    'data'  => null
+                ], 401);
+            }
+
+            $user = $request->user();
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'message' => 'login berhasil',
+                'access_token' => $token,
+                'user' => $user
+            ], 200);
         } catch(Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+           return response()->json([
+                'message' => $e->getMessage(),
+                'data'  => null
+            ], 500);
         }
 
     }
