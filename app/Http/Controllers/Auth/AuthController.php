@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Exception;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -60,7 +61,19 @@ class AuthController extends Controller
 
     }
 
-    public function logout() {
+    public function logout(Request $request) {
+        try {
+            $request->user()->currentAccessToken()->delete();
 
+            return response()->json([
+                'message' => 'logout berhasil',
+                'data' => null
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'data'  => null
+            ], 500);
+        }
     }
 }

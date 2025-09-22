@@ -1,0 +1,40 @@
+meta {
+  name: login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+   "email":"test@gmail.com",
+   "password":"123"
+  }
+}
+
+script:post-response {
+  const data = response.json;
+  
+  if (data.token) {
+    bruno.setEnvVar("token", data.token);
+    console.log("✅ Token berhasil disimpan:", data.token);
+  } else if (data.access_token) {
+    bruno.setEnvVar("token", data.access_token);
+    console.log("✅ Access Token berhasil disimpan:", data.access_token);
+  } else if (data.plainTextToken) {
+    bruno.setEnvVar("token", data.plainTextToken);
+    console.log("✅ PlainTextToken berhasil disimpan:", data.plainTextToken);
+  } else {
+    console.log("⚠️ Token tidak ditemukan di response:", data);
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+}

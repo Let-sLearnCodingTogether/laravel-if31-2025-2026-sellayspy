@@ -1,0 +1,24 @@
+meta {
+  name: logout
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/logout
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Authorization: Bearer 6|vXRl63vFfMB1QCNTbDoEWUbNcQDD9VML1XbnBaQt41cb7a7c
+}
+
+auth:bearer {
+  token: 
+}
+
+settings {
+  encodeUrl: true
+}
